@@ -1,0 +1,37 @@
+﻿@page "/fooditems"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using MyNutritionTracker.Models
+@using MyNutritionTracker.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<MyNutritionTracker.Data.DataContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="fooditems/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.FoodItem">
+    <PropertyColumn Property="fooditem => fooditem.Name" />
+    <PropertyColumn Property="fooditem => fooditem.Description" />
+
+    <TemplateColumn Context="fooditem">
+        <a href="@($"fooditems/edit?id={fooditem.Id}")">Edit</a> |
+        <a href="@($"fooditems/details?id={fooditem.Id}")">Details</a> |
+        <a href="@($"fooditems/delete?id={fooditem.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private DataContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}
