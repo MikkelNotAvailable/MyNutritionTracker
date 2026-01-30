@@ -1,0 +1,48 @@
+﻿@page "/fooditems/details"
+@using Microsoft.EntityFrameworkCore
+@using MyNutritionTracker.Models
+@inject IDbContextFactory<MyNutritionTracker.Data.DataContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>FoodItem</h2>
+    <hr />
+    @if (fooditem is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Name</dt>
+            <dd class="col-sm-10">@fooditem.Name</dd>
+            <dt class="col-sm-2">Description</dt>
+            <dd class="col-sm-10">@fooditem.Description</dd>
+        </dl>
+        <div>
+            <a href="@($"/fooditems/edit?id={fooditem.Id}")">Edit</a> |
+            <a href="@($"/fooditems")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private FoodItem? fooditem;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        fooditem = await context.FoodItem.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (fooditem is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

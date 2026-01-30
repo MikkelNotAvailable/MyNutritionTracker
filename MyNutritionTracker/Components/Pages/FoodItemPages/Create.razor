@@ -1,0 +1,49 @@
+﻿@page "/fooditems/create"
+@using Microsoft.EntityFrameworkCore
+@using MyNutritionTracker.Models
+@inject IDbContextFactory<MyNutritionTracker.Data.DataContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>FoodItem</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="FoodItem" OnValidSubmit="AddFoodItem" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label> 
+                <InputText id="name" @bind-Value="FoodItem.Name" class="form-control" /> 
+                <ValidationMessage For="() => FoodItem.Name" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="description" class="form-label">Description:</label> 
+                <InputText id="description" @bind-Value="FoodItem.Description" class="form-control" /> 
+                <ValidationMessage For="() => FoodItem.Description" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/fooditems">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private FoodItem FoodItem { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddFoodItem()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.FoodItem.Add(FoodItem);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/fooditems");
+    }
+}
